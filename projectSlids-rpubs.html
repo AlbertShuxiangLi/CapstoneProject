@@ -801,12 +801,13 @@ hljs.initHighlightingOnLoad();
 <li>If the next word can not be found under current <em>N-Grams</em>, following <strong>Stupid Backoff Algorithm</strong> has been use to pick up the most-likely next wrod:</li>
 </ul>
 
-<p>\[ Total_{prob} = 1.0 * QuadGrams_{prob} + 0.40 * TriGrams_{prob} 
-                + 0.16 * BiGrams_{prob} + 0.064 * UniGram_{prob} \]</p>
+<p>\[ Total_{prob}=1.0*Q+0.4*T+0.16*B+0.064*U \]</p>
 
-<h4>Note1: <strong>\( Total_{prob} \)</strong> is not normalized.</h4>
+<h4>Note1: <strong>\( Total_{prob} \)</strong> is not normalized; \( Q=QuadGrams_{prob}; T=TriGrams_{prob}; \)</h4>
 
-<h4>Note2: For this project <strong>Stupid Backoff Algorithm</strong> is much faster than Kneser-Ney smoothing.</h4>
+<h4>\( B=BiGrams_{prob}; U=UniGram_{prob} \).</h4>
+
+<h4>Note2: For this project <strong>Stupid Backoff Algorithm</strong> is faster than Kneser-Ney smoothing.</h4>
 
 </div>
 

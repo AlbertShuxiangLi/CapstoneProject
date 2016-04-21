@@ -9,17 +9,11 @@ suppressPackageStartupMessages(c(
   library(stylo)))
 
 shinyUI(navbarPage("Coursera Data Science Capstone Project", 
-                   
                    theme = shinytheme("flatly"),
-                   
                    ## Tab 1 - Prediction
-                   
                    tabPanel("NEXT WORD PREDICTION",
-                            
                             tags$head(includeScript("./js/ga-shinyapps-io.js")),
-                            
                             fluidRow(
-                              
                               column(3),
                               column(6,
                                      tags$div(textInput("text", 
@@ -40,9 +34,7 @@ shinyUI(navbarPage("Coursera Data Science Capstone Project",
                               column(3)
                             )
                    ),
-                   
                    ## Tab 2 - About 
-                   
                    tabPanel("NOTES FOR APPLICATION",
                             fluidRow(
                               column(2,
@@ -53,13 +45,9 @@ shinyUI(navbarPage("Coursera Data Science Capstone Project",
                                      p(""))
                             )
                    ),
-                   
                    ## Footer
-                   
                    tags$hr(),
-                   
                    tags$br(),
-                   
                    tags$span(style="color:grey", 
                              tags$footer(("CREATED BY"), tags$a(
                                            href="http://www.r-project.org/",
@@ -69,9 +57,7 @@ shinyUI(navbarPage("Coursera Data Science Capstone Project",
                                            href="http://shiny.rstudio.com",
                                            target="_blank",
                                            "Shiny."),
-                                         
                                          align = "center"),
-                             
                              tags$br()
                    )
 )

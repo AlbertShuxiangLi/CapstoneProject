@@ -29,11 +29,11 @@ APPLIED METHODS & MODELS (2)
 - When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
 - If the next word can not be found under current *N-Grams*, following **Stupid Backoff Algorithm** has been use to pick up the most-likely next wrod:
 
-$$Total_{prob} = 1.0 * QuadGrams_{prob} + 0.40 * TriGrams_{prob} 
-                + 0.16 * BiGrams_{prob} + 0.064 * UniGram_{prob}$$
+$$Total_{prob}=1.0*Q+0.4*T+0.16*B+0.064*U$$
 
-#### Note1: **$Total_{prob}$** is not normalized. 
-#### Note2: For this project __Stupid Backoff Algorithm__ is much faster than Kneser-Ney smoothing.
+#### Note1: **$Total_{prob}$** is not normalized; $Q=QuadGrams_{prob}; T=TriGrams_{prob};$
+#### $B=BiGrams_{prob}; U=UniGram_{prob}$.  
+#### Note2: For this project __Stupid Backoff Algorithm__ is faster than Kneser-Ney smoothing.
 
 HOW TO USE
 ========================================================

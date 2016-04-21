@@ -13,7 +13,6 @@ final4Data <- readRDS(file="./data/4.RData")
 final3Data <- readRDS(file="./data/3.RData")
 final2Data <- readRDS(file="./data/2.RData")
 
-
 shinyServer(function(input, output) {
   
   wordPrediction <- reactive({

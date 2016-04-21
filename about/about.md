@@ -61,4 +61,4 @@ Mobile users are targeted by this light-weighted application. While entering the
 
 * The scripts related to this shiny application, as well as the milestone report and the presentation can be found in [this GitHub repository](https://github.com/AlbertShuxiangLi/CapstoneProject).
 
-* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/173138).
+* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/173176).
