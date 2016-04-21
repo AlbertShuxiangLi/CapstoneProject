@@ -17,8 +17,9 @@ output: html_document
 
 #### APPLIED METHODS AND MODELS
 
-After a Corpus generated from HC Corpora, then following clean up steps are performed.  
+After a Corpus generated, then following clean up steps are performed.  
   
+  * Convert to ASCII to eliminate any funny words
   * Convert all words to lowercase
   * Eliminate punctuation
   * Eliminate numbers
@@ -32,12 +33,11 @@ This sampled corpus was then used to creat unigram, bigram, trigram and quadgram
 
 When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. If the next word can not be found under current *N-Grams*, following **Stupid Backoff Algorithm** has been use to pick up the most-likely next-wrod:
 
-Total_prob = 1.0 * Quad-Grams_prob 
-                + 0.40 * Tri-Grams_prob 
-                + 0.16 * Bi-Grams_prob 
-                + 0.064 * Uni-Gram_prob
+__Total_prob = 1.0 * QuadGrams_prob + 0.40 * TriGrams_prob 
+                + 0.16 * BiGrams_prob + 0.064 * UniGram_prob__
 
-(Note: Total_prob is not normalized.)
+(Note1: __Total_prob__ is not normalized.
+ Note2: For this project __Stupid Backoff Algorithm__ is much faster than Kneser-Ney smoothing.)
 
 ******
 
@@ -59,6 +59,6 @@ Mobile users are targeted by this light-weighted application. While entering the
 
 #### LINKS
 
-* The whole code of this application, as well as all the milestone report, related scripts, this presentation  etc. can be found in this GitHub repo: [https://github.com/AlbertShuxiangLi/](https://github.com)
+* The scripts related to this shiny application, as well as the milestone report and the presentation can be found in [this GitHub repository](https://github.com/AlbertShuxiangLi/CapstoneProject).
 
-* My Slid Deck is [HERE](http://rpubs.com/).
+* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/173138).

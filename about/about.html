@@ -80,8 +80,9 @@ img {
 </div>
 <div id="applied-methods-and-models" class="section level4">
 <h4>APPLIED METHODS AND MODELS</h4>
-<p>After a Corpus generated from HC Corpora, then following clean up steps are performed.</p>
+<p>After a Corpus generated, then following clean up steps are performed.</p>
 <ul>
+<li>Convert to ASCII to eliminate any funny words</li>
 <li>Convert all words to lowercase</li>
 <li>Eliminate punctuation</li>
 <li>Eliminate numbers</li>
@@ -93,8 +94,8 @@ img {
 </ul>
 <p>This sampled corpus was then used to creat unigram, bigram, trigram and quadgram <a href="http://en.wikipedia.org/wiki/N-gram">See wikipedia <em>N-Grams</em></a>.</p>
 <p>When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying <em>N-Grams</em>. If the next word can not be found under current <em>N-Grams</em>, following <strong>Stupid Backoff Algorithm</strong> has been use to pick up the most-likely next-wrod:</p>
-<p>Total_prob = 1.0 * Quad-Grams_prob + 0.40 * Tri-Grams_prob + 0.16 * Bi-Grams_prob + 0.064 * Uni-Gram_prob</p>
-<p>(Note: Total_prob is not normalized.)</p>
+<p><strong>Total_prob = 1.0 * QuadGrams_prob + 0.40 * TriGrams_prob + 0.16 * BiGrams_prob + 0.064 * UniGram_prob</strong></p>
+<p>(Note1: <strong>Total_prob</strong> is not normalized. Note2: For this project <strong>Stupid Backoff Algorithm</strong> is much faster than Kneser-Ney smoothing.)</p>
 <hr />
 </div>
 <div id="how-to-use" class="section level4">
@@ -114,8 +115,8 @@ img {
 <div id="links" class="section level4">
 <h4>LINKS</h4>
 <ul>
-<li><p>The whole code of this application, as well as all the milestone report, related scripts, this presentation etc. can be found in this GitHub repo: <a href="https://github.com"><a href="https://github.com/AlbertShuxiangLi/" class="uri">https://github.com/AlbertShuxiangLi/</a></a></p></li>
-<li><p>My Slid Deck is <a href="http://rpubs.com/">HERE</a>.</p></li>
+<li><p>The scripts related to this shiny application, as well as the milestone report and the presentation can be found in <a href="https://github.com/AlbertShuxiangLi/CapstoneProject">this GitHub repository</a>.</p></li>
+<li><p>My Slid Deck is <a href="http://rpubs.com/Albert_Shuxiang_Li/173138">HERE</a>.</p></li>
 </ul>
 </div>
 
