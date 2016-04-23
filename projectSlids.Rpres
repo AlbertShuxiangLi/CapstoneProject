@@ -1,7 +1,7 @@
 Cousera Capstone Project
 ========================================================
 author: Albert Shuxiang Li
-date: 20 April 2016
+date: 23 April 2016
 
 OBJECTIVES
 - Build a shiny application to predict the next word.  
@@ -27,23 +27,19 @@ APPLIED METHODS & MODELS (2)
 ========================================================
 
 - When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
-- If the next word can not be found under current *N-Grams*, following **Stupid Backoff Algorithm** has been use to pick up the most-likely next wrod:
+- If the next word can not be found under current *N-Grams*, then *(N-1)-Grams* will be used.
 
-$$Total_{prob}=1.0*Q+0.4*T+0.16*B+0.064*U$$
-
-#### Note1: **$Total_{prob}$** is not normalized; $Q=QuadGrams_{prob}; T=TriGrams_{prob};$
-#### $B=BiGrams_{prob}; U=UniGram_{prob}$.  
-#### Note2: For this project __Stupid Backoff Algorithm__ is faster than Kneser-Ney smoothing.
+#### Note1: Currently, only frequency table has being used for speed reason.
+#### Note2: Stupid Backoff Algorithm and Kneser-Ney smoothing would be implemented if time allowed.
 
 HOW TO USE
 ========================================================
 
+![Shiny Screenshot](screen.png)
+***
 - Mobile users are targeted by this light-weighted application. 
 - While entering the text, the predicted next word will be shown instantaneously.
 - What the user has entered will be displayed for verification purpose.
-
-![Shiny Screenshot](screen.png)
-
 
 NOTES
 ========================================================

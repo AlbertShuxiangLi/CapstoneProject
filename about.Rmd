@@ -1,7 +1,7 @@
 ---
 title: "NOTES FOR THE COURSERA DATA SCIENCE CAPSTONE PROJECT"
 author: "Albert Shuxiang Li"
-date: "April 20, 2016"
+date: "April 23, 2016"
 output: html_document
 ---
 
@@ -31,13 +31,11 @@ After a Corpus generated, then following clean up steps are performed.
 
 This sampled corpus was then used to creat unigram, bigram, trigram and quadgram [See wikipedia *N-Grams*](http://en.wikipedia.org/wiki/N-gram). 
 
-When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. If the next word can not be found under current *N-Grams*, following **Stupid Backoff Algorithm** has been use to pick up the most-likely next-wrod:
+When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. If the next word can not be found under current *N-Grams*, then *(N-1)-Grams* will be used.
 
-__Total_prob = 1.0 * QuadGrams_prob + 0.40 * TriGrams_prob 
-                + 0.16 * BiGrams_prob + 0.064 * UniGram_prob__
+Note1: Currently, only frequency table has being used for speed reason.
 
-(Note1: __Total_prob__ is not normalized.
- Note2: For this project __Stupid Backoff Algorithm__ is much faster than Kneser-Ney smoothing.)
+Note2: Stupid Backoff Algorithm and Kneser-Ney smoothing would be implemented if time allowed.
 
 ******
 
@@ -61,4 +59,4 @@ Mobile users are targeted by this light-weighted application. While entering the
 
 * The scripts related to this shiny application, as well as the milestone report and the presentation can be found in [this GitHub repository](https://github.com/AlbertShuxiangLi/CapstoneProject).
 
-* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/173176).
+* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/173996).

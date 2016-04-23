@@ -8,10 +8,10 @@ suppressPackageStartupMessages(c(
   library(markdown),
   library(stylo)))
 
-shinyUI(navbarPage("Coursera Data Science Capstone Project", 
+shinyUI(navbarPage("Coursera Capstone", 
                    theme = shinytheme("flatly"),
                    ## Tab 1 - Prediction
-                   tabPanel("NEXT WORD PREDICTION",
+                   tabPanel("PREDICTION",
                             tags$head(includeScript("./js/ga-shinyapps-io.js")),
                             fluidRow(
                               column(3),
@@ -35,12 +35,12 @@ shinyUI(navbarPage("Coursera Data Science Capstone Project",
                             )
                    ),
                    ## Tab 2 - About 
-                   tabPanel("NOTES FOR APPLICATION",
+                   tabPanel("NOTES",
                             fluidRow(
                               column(2,
                                      p("")),
                               column(8,
-                                     includeMarkdown("./about/about.md")),
+                                     includeMarkdown("./about.Rmd")),
                               column(2,
                                      p(""))
                             )

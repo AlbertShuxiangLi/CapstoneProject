@@ -8,9 +8,9 @@ suppressPackageStartupMessages(c(
   library(markdown),
   library(stylo)))
 
-final4Data <- readRDS(file="./data/4.RData")
-final3Data <- readRDS(file="./data/3.RData")
-final2Data <- readRDS(file="./data/2.RData")
+F4D <- readRDS(file="./data/4.RData")
+F3D <- readRDS(file="./data/3.RData")
+F2D <- readRDS(file="./data/2.RData")
 
 dataCleaner<- function(text){
   cleanText <- tolower(text)
@@ -41,14 +41,14 @@ nextWordPrediction <- function(wordCount,textInput){
     textInput <- c(NA,NA,textInput)
   }
   
-wordPrediction <- as.character(final4Data[final4Data$unigram==textInput[1] & 
-                                              final4Data$bigram==textInput[2] & 
-                                              final4Data$trigram==textInput[3],][1,]$quadgram)
+wordPrediction <- as.character(F4D[F4D$unigram==textInput[1] & 
+                                              F4D$bigram==textInput[2] & 
+                                              F4D$trigram==textInput[3],][1,]$quadgram)
   if(is.na(wordPrediction)) {
-    wordPrediction1 <- as.character(final3Data[final3Data$unigram==textInput[2] & 
-                                                 final3Data$bigram==textInput[3],][1,]$trigram)
+    wordPrediction <- as.character(F3D[F3D$unigram==textInput[2] & 
+                                                 F3D$bigram==textInput[3],][1,]$trigram)
   if(is.na(wordPrediction)) {
-      wordPrediction <- as.character(final2Data[final2Data$unigram==textInput[3],][1,]$bigram)
+      wordPrediction <- as.character(F2D[F2D$unigram==textInput[3],][1,]$bigram)
     }
   }
   cat(wordPrediction)

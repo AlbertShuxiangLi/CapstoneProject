@@ -1,0 +1,405 @@
+---
+title: "Capstone - Week2 - Milestone Report"
+author: "Albert Shuxiang Li"
+date: "March 23, 2016"
+output: html_document
+---
+## Introduction
+This is a progress brief for my Coursera Data Science Capstone Project. The objective is to explain the Explortory Data Analysis which will lead to the eventual prediction app and algorithm. 
+
+The raw corpus data are located at my desktop hard desk:    
+
+  * Blog "./data/Coursera-SwiftKey/final/en_US/en_US.blogs.txt"
+  * News "./data/Coursera-SwiftKey/final/en_US/en_US.news.txt"
+  * Twitter "./data/Coursera-SwiftKey/final/en_US/en_US.twitter.txt"  
+
+## Download and Unzip Raw Data
+
+Download corpus dataset from Coursera data source [(Corpus Data Source)](https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip)  and then unzip it to local disk. 
+
+```{r, ch0, echo=FALSE, cache=TRUE}
+# Check zip file and download if needed
+if (!file.exists("./data/Coursera-SwiftKey.zip")) {
+    download.file("https://d396qusza40orc.cloudfront.net/dsscapstone/dataset/Coursera-SwiftKey.zip", 
+        destfile = "./data/Coursera-SwiftKey.zip")
+}
+# Check data file and unzip if needed
+if (!file.exists("./data/Coursera-SwiftKey/final/en_US/en_US.blogs.txt")) {
+    unzip("./data/Coursera-SwiftKey.zip", exdir = "./data/Coursera-SwiftKey/final/en_US", list = TRUE)
+}
+
+```
+
+## Get Basic Information about Corpus Dataset
+
+Here is the basic information retrived from raw corpus dataset. The code is attached as Appendix.  
+
+```{r, ch1, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+# Preload necessary R librabires
+library(knitr); library(dplyr); library(doParallel)
+library(stringi); library(tm); library(ggplot2); library(wordcloud)
+
+path1 <- "./data/Coursera-SwiftKey/final/en_US/en_US.blogs.txt"
+path2 <- "./data/Coursera-SwiftKey/final/en_US/en_US.news.txt"
+path3 <- "./data/Coursera-SwiftKey/final/en_US/en_US.twitter.txt"
+
+# Read blogs data in binary mode
+conn <- file(path1, open="rb"); blogs <- readLines(conn, encoding="UTF-8"); close(conn)
+# Read news data in binary mode
+conn <- file(path2, open="rb"); news <- readLines(conn, encoding="UTF-8"); close(conn)
+# Read twitter data in binary mode
+conn <- file(path3, open="rb"); twitter <- readLines(conn, encoding="UTF-8"); close(conn)
+# Remove temporary variable
+rm(conn)
+
+# Compute statistics and summary info for each data type
+stats_for_raw <- data.frame(
+            FileName=c("en_US.blogs","en_US.news","en_US.twitter"),
+            FileSizeinMB=c(file.info(path1)$size/1024^2,
+                           file.info(path2)$size/1024^2,
+                           file.info(path3)$size/1024^2),
+            t(rbind(sapply(list(blogs,news,twitter),stri_stats_general),
+            WordCount=sapply(list(blogs,news,twitter),stri_stats_latex)[4,]))
+            )
+kable(stats_for_raw)
+```
+
+## Sample and Clean
+
+Random sampling method (12,000 lines per file) is justified because of the large corpus text data and my limited computation power. 
+
+```{r, ch2, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+# Set random seed for reproducibility
+set.seed(3606)
+sampleBlogs <- blogs[sample(1:length(blogs), 12000, replace=FALSE)]
+sampleNews <- news[sample(1:length(news), 12000, replace=FALSE)]
+sampleTwitter <- twitter[sample(1:length(twitter), 12000, replace=FALSE)]
+
+# Define a function to remove unconvention/funny characters
+remove_funny <- function (x) {
+  sampleX <- x
+  for (i in 1:length(sampleX)) {
+    original_row <- sampleX[i]
+    cleaned_row <- iconv(original_row, "UTF-8", "ASCII", sub = "")
+    sampleX[i] <- cleaned_row
+  }
+x <- sampleX
+}
+
+# Remove unconvention/funny characters for sampled Blogs/News/Twitter
+sampleBlogs <- remove_funny(sampleBlogs)
+sampleNews <- remove_funny(sampleNews)
+sampleTwitter <- remove_funny(sampleTwitter)
+
+# Save merged corpus samples to hard disk
+# IF NEEDED, would write each sampled corpus to separated files
+writeLines(sampleDat <- c(sampleBlogs, sampleNews, sampleTwitter), "./sample/sampleDat.txt")
+
+# Remove temporary variables
+rm(blogs, news, twitter, path1, path2, path3, sampleDat)
+```
+Next, sampled data is used to create a corpus; and following clean up steps are performed.  
+  
+  * Convert all words to lowercase
+  * Eliminate punctuation
+  * Eliminate numbers
+  * Strip whitespace
+  * Eliminate profan words
+  * English stop words
+  * Stemming (Using Porter's Stemming Algorithm)
+  * Create Plain Text Format
+
+Thereafter, a Document Term Matrix (DTM) is create for each corpus. The code fro this section is attached as Appendix.
+
+```{r, ch3, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+sampleDATA <- list(sampleBlogs, sampleNews, sampleTwitter)
+# Create corpus and Document Term Matrix (DTM) vectors
+corpus <- list()
+dtMatrix <- list()
+# Iterate each sampled corpus data to clean up and create DTM
+for (i in 1:length(sampleDATA)) {
+    # Create corpus dataset
+    corpus[[i]] <- Corpus(VectorSource(sampleDATA[[i]]))
+    # Cleaning Up corpus dataset
+    corpus[[i]] <- tm_map(corpus[[i]], tolower)
+    # Eleminate punctuation
+    corpus[[i]] <- tm_map(corpus[[i]], removePunctuation)
+    # Eleminate numbers
+    corpus[[i]] <- tm_map(corpus[[i]], removeNumbers)
+    # Strip Whitespace
+    corpus[[i]] <- tm_map(corpus[[i]], stripWhitespace)
+    # Eliminate profane words
+    profanewords <- readLines("./docs/badwords.txt", n = 450)
+    corpus[[i]] <- tm_map(corpus[[i]], removeWords, profanewords)
+    # Eleminate English stop words
+    corpus[[i]] <- tm_map(corpus[[i]], removeWords, stopwords("english"))
+    # Perform stemming
+    corpus[[i]] <- tm_map(corpus[[i]], stemDocument)
+    # Create plain text format
+    corpus[[i]] <- tm_map(corpus[[i]], PlainTextDocument)
+    # Calculate document term frequency for corpus
+    dtMatrix[[i]] <- DocumentTermMatrix(corpus[[i]], control=list(wordLengths=c(0,Inf)))
+}
+# Eleminate temporary variables
+rm(sampleDATA)
+
+```
+
+## Plot Sampled Corpus Data with Word Cloud
+
+The wordcloud package is used to demostrate what each corpus looks like, the word frequency mapping. Here is the example for US English Blogs corpus. Other two corpora or the combination of the total three also can be used in the similar way.
+
+```{r, ch4, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE, fig.align='center'}
+library(wordcloud); library(slam)
+# Set random seed for reproducibility
+set.seed(3606)
+# Set Plotting in 1 row 3 columns
+par(mfrow=c(1, 3))
+Headings= c("Word Cloud - US English Blogs",
+            "Word Cloud - US English News", 
+            "Word Cloud - US English Twitter")
+
+# Iterate each corpus and DTM and plot word cloud (Max = 100)
+for (i in 1:length(corpus)) {
+    wordcloud(words = colnames(dtMatrix[[i]]), freq = slam::col_sums(dtMatrix[[i]]), 
+        scale = c(3, 1), max.words = 100, random.order = FALSE, rot.per = 0.45, 
+        use.r.layout = FALSE, colors = brewer.pal(8, "Dark2"))
+    title(Headings[i])
+}
+```
+
+## Ngrams Tokenization
+
+The RWeka package has been used to develope Tokeniziers function in order to create unigram, bigram and trigram. And then ggplot2 package has been used to plot them.  
+
+The function "plot.Grams" is the self-defined function to implemente functionalities mentioed above. See appendix for the code details.
+
+```{r, ch6, results='hide', echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE, error=FALSE}
+library(tm); library(qdap); library(rJava)
+.jinit(parameters="-Xmx128g")
+library(RWeka); library(ggplot2); library(dplyr)
+```
+
+```{r, ch7, eval=TRUE, echo=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+# Define a function to make Unigram, Bigram and Trigram from the corpus
+# And then Plot them together with ggplot2 and gridExtra packages
+plot.Grams <- function (x=sampleBlogs, subTitle="Blogs", N=10) {
+# Use RWeka to get unigram token
+Tokenizer1 <- RWeka::NGramTokenizer(x, Weka_control(min = 1, max = 1))
+Gram.1 <- data.frame(table(Tokenizer1))
+Gram.1 <- Gram.1[order(Gram.1$Freq, decreasing = TRUE),]
+colnames(Gram.1) <- c("Word", "Freq")
+Gram.1 <- head(Gram.1, N) 
+g1 <- ggplot(Gram.1, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="green") + 
+        ggtitle(paste("Unigrams", "-", subTitle)) + 
+        xlab("Unigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Use RWeka to get bigram token
+Tokenizer2 <- RWeka::NGramTokenizer(x, Weka_control(min = 2, max = 2, 
+                                                          delimiters = " \\r\\n\\t.,;:\"()?!"))
+Gram.2 <- data.frame(table(Tokenizer2))
+Gram.2 <- Gram.2[order(Gram.2$Freq, decreasing = TRUE),]
+colnames(Gram.2) <- c("Word", "Freq")
+Gram.2 <- head(Gram.2, N) 
+g2 <- ggplot(Gram.2, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="blue") + 
+        ggtitle(paste("Bigrams", "-", subTitle)) + 
+        xlab("Bigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Use RWeka to get trigram token
+Tokenizer3 <- RWeka::NGramTokenizer(x, Weka_control(min = 3, max = 3, 
+                                                          delimiters = " \\r\\n\\t.,;:\"()?!"))
+Gram.3 <- data.frame(table(Tokenizer3))
+Gram.3 <- Gram.3[order(Gram.3$Freq, decreasing = TRUE),]
+colnames(Gram.3) <- c("Word", "Freq")
+Gram.3 <- head(Gram.3, N) 
+g3 <- ggplot(Gram.3, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="darkgreen") + 
+        ggtitle(paste("Trigrams", "-", subTitle)) + 
+        xlab("Trigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Put three plots into 1 row 3 columns
+gridExtra::grid.arrange(g1, g2, g3, ncol = 3)
+}
+```
+
+```{r, ch71, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE, fig.align='center'}
+library(ggplot2); library(gridExtra)
+plot.Grams(x = sampleBlogs, subTitle = "Blogs", N = 12)
+plot.Grams(x = sampleNews, subTitle = "News", N = 12)
+plot.Grams(x = sampleTwitter, subTitle = "Twitter", N = 12)
+```
+
+## Further Development Plan
+After the exploratory analysis, I think it is ready to start building the predictive model(s) and eventually the data product. Here is my further steps:  
+  
+  * Establish the predictive model(s) by using the tokens.
+  * Develop data product (i.e. shiny app) to make word prediction based on user inputs.
+  
+## Appendix - Code for Basic Information
+```{r, echo=TRUE, eval=FALSE}
+# Preload necessary R librabires
+library(knitr); library(dplyr); library(doParallel)
+library(stringi); library(tm); library(ggplot2); library(wordcloud)
+
+path1 <- "./data/Coursera-SwiftKey/final/en_US/en_US.blogs.txt"
+path2 <- "./data/Coursera-SwiftKey/final/en_US/en_US.news.txt"
+path3 <- "./data/Coursera-SwiftKey/final/en_US/en_US.twitter.txt"
+
+# Read blogs data in binary mode
+conn <- file(path1, open="rb"); blogs <- readLines(conn, encoding="UTF-8"); close(conn)
+# Read news data in binary mode
+conn <- file(path2, open="rb"); news <- readLines(conn, encoding="UTF-8"); close(conn)
+# Read twitter data in binary mode
+conn <- file(path3, open="rb"); twitter <- readLines(conn, encoding="UTF-8"); close(conn)
+# Remove temporary variable
+rm(conn)
+
+# Compute statistics and summary info for each data type
+stats_for_raw <- data.frame(
+            FileName=c("en_US.blogs","en_US.news","en_US.twitter"),
+            FileSizeinMB=c(file.info(path1)$size/1024^2,
+                           file.info(path2)$size/1024^2,
+                           file.info(path3)$size/1024^2),
+            t(rbind(sapply(list(blogs,news,twitter),stri_stats_general),
+            WordCount=sapply(list(blogs,news,twitter),stri_stats_latex)[4,]))
+            )
+kable(stats_for_raw)
+```
+
+## Appendix - Code for Sample and Clean
+```{r, echo=TRUE, eval=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+# Set random seed for reproducibility
+set.seed(3606)
+sampleBlogs <- blogs[sample(1:length(blogs), 12000, replace=FALSE)]
+sampleNews <- news[sample(1:length(news), 12000, replace=FALSE)]
+sampleTwitter <- twitter[sample(1:length(twitter), 12000, replace=FALSE)]
+
+# Define a function to remove unconvention/funny characters
+remove_funny <- function (x) {
+  sampleX <- x
+  for (i in 1:length(sampleX)) {
+    original_row <- sampleX[i]
+    cleaned_row <- iconv(original_row, "UTF-8", "ASCII", sub = "")
+    sampleX[i] <- cleaned_row
+  }
+x <- sampleX
+}
+
+# Remove unconvention/funny characters for sampled Blogs/News/Twitter
+sampleBlogs <- remove_funny(sampleBlogs)
+sampleNews <- remove_funny(sampleNews)
+sampleTwitter <- remove_funny(sampleTwitter)
+
+# Save merged corpus samples to hard disk
+# IF NEEDED, would write each sampled corpus to separated files
+writeLines(sampleDat <- c(sampleBlogs, sampleNews, sampleTwitter), "./sample/sampleDat.txt")
+
+# Remove temporary variables
+rm(blogs, news, twitter, path1, path2, path3, sampleDat)
+
+sampleDATA <- list(sampleBlogs, sampleNews, sampleTwitter)
+# Create corpus and Document Term Matrix (DTM) vectors
+corpus <- list()
+dtMatrix <- list()
+# Iterate each sampled corpus data to clean up and create DTM
+for (i in 1:length(sampleDATA)) {
+    # Create corpus dataset
+    corpus[[i]] <- Corpus(VectorSource(sampleDATA[[i]]))
+    # Cleaning Up corpus dataset
+    corpus[[i]] <- tm_map(corpus[[i]], tolower)
+    # Eleminate punctuation
+    corpus[[i]] <- tm_map(corpus[[i]], removePunctuation)
+    # Eleminate numbers
+    corpus[[i]] <- tm_map(corpus[[i]], removeNumbers)
+    # Strip Whitespace
+    corpus[[i]] <- tm_map(corpus[[i]], stripWhitespace)
+    # Eliminate profane words
+    profanewords <- readLines("./docs/badwords.txt", n = 450)
+    corpus[[i]] <- tm_map(corpus[[i]], removeWords, profanewords)
+    # Eleminate English stop words
+    corpus[[i]] <- tm_map(corpus[[i]], removeWords, stopwords("english"))
+    # Perform stemming
+    corpus[[i]] <- tm_map(corpus[[i]], stemDocument)
+    # Create plain text format
+    corpus[[i]] <- tm_map(corpus[[i]], PlainTextDocument)
+    # Calculate document term frequency for corpus
+    dtMatrix[[i]] <- DocumentTermMatrix(corpus[[i]], control=list(wordLengths=c(0,Inf)))
+}
+# Eleminate temporary variables
+rm(sampleDATA)
+```
+
+## Appendix - Code for Plot of Sampled Corpus with Word Cloud
+```{r, echo=TRUE, eval=FALSE, cache=TRUE, warning=FALSE, message=FALSE}
+library(wordcloud); library(slam)
+# Set random seed for reproducibility
+set.seed(3606)
+# Set Plotting in 1 row 3 columns
+par(mfrow=c(1, 3))
+Headings= c("Word Cloud - US English Blogs",
+            "Word Cloud - US English News", 
+            "Word Cloud - US English Twitter")
+
+# Iterate each corpus and DTM and plot word cloud (Max = 100)
+for (i in 1:length(corpus)) {
+    wordcloud(words = colnames(dtMatrix[[i]]), freq = slam::col_sums(dtMatrix[[i]]), 
+        scale = c(3, 1), max.words = 100, random.order = FALSE, rot.per = 0.45, 
+        use.r.layout = FALSE, colors = brewer.pal(8, "Dark2"))
+    title(Headings[i])
+}
+```
+
+## Appendix - Code for Ngrams Tokenization
+
+```{r, eval=FALSE, echo=TRUE, cache=TRUE, warning=FALSE, message=FALSE}
+library(tm); library(qdap); library(rJava)
+.jinit(parameters="-Xmx128g")
+library(RWeka); library(ggplot2); library(dplyr)
+
+# Define a function to make Unigram, Bigram and Trigram from the corpus
+# And then Plot them together with ggplot2 and gridExtra packages
+plot.Grams <- function (x=sampleBlogs, subTitle="Blogs", N=10) {
+# Use RWeka to get unigram token
+Tokenizer1 <- RWeka::NGramTokenizer(x, Weka_control(min = 1, max = 1))
+Gram.1 <- data.frame(table(Tokenizer1))
+Gram.1 <- Gram.1[order(Gram.1$Freq, decreasing = TRUE),]
+colnames(Gram.1) <- c("Word", "Freq")
+Gram.1 <- head(Gram.1, N) 
+g1 <- ggplot(Gram.1, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="green") + 
+        ggtitle(paste("Unigrams", "-", subTitle)) + 
+        xlab("Unigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Use RWeka to get bigram token
+Tokenizer2 <- RWeka::NGramTokenizer(x, Weka_control(min = 2, max = 2, 
+                                                          delimiters = " \\r\\n\\t.,;:\"()?!"))
+Gram.2 <- data.frame(table(Tokenizer2))
+Gram.2 <- Gram.2[order(Gram.2$Freq, decreasing = TRUE),]
+colnames(Gram.2) <- c("Word", "Freq")
+Gram.2 <- head(Gram.2, N) 
+g2 <- ggplot(Gram.2, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="blue") + 
+        ggtitle(paste("Bigrams", "-", subTitle)) + 
+        xlab("Bigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Use RWeka to get trigram token
+Tokenizer3 <- RWeka::NGramTokenizer(sampleBlogs, Weka_control(min = 3, max = 3, 
+                                                          delimiters = " \\r\\n\\t.,;:\"()?!"))
+Gram.3 <- data.frame(table(Tokenizer3))
+Gram.3 <- Gram.3[order(Gram.3$Freq, decreasing = TRUE),]
+colnames(Gram.3) <- c("Word", "Freq")
+Gram.3 <- head(Gram.3, N) 
+g3 <- ggplot(Gram.3, aes(x=reorder(Word, Freq),y=Freq)) + 
+        geom_bar(stat="identity", fill="darkgreen") + 
+        ggtitle(paste("Trigrams", "-", subTitle)) + 
+        xlab("Trigrams") + ylab("Frequency") + 
+        theme(axis.text.x=element_text(angle=90, hjust=1))
+# Put three plots into 1 row 3 columns
+gridExtra::grid.arrange(g1, g2, g3, ncol = 3)
+}
+plot.Grams(x = sampleBlogs, subTitle = "Blogs", N = 12)
+plot.Grams(x = sampleNews, subTitle = "News", N = 12)
+plot.Grams(x = sampleTwitter, subTitle = "Twitter", N = 12)
+```
