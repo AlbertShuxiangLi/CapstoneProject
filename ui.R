@@ -1,64 +1,40 @@
-## Data Science Capstone Project
+# ui.R
+library(shiny)
 
-suppressPackageStartupMessages(c(
-  library(shinythemes),
-  library(shiny),
-  library(tm),
-  library(stringr),
-  library(markdown),
-  library(stylo)))
-
-shinyUI(navbarPage("Coursera Capstone", 
-                   theme = shinytheme("flatly"),
-                   ## Tab 1 - Prediction
-                   tabPanel("PREDICTION",
-                            tags$head(includeScript("./js/ga-shinyapps-io.js")),
-                            fluidRow(
-                              column(3),
-                              column(6,
-                                     tags$div(textInput("text", 
-                                                        label = h3("Enter Your Text Below:"),
-                                                        value = ),
-                                              tags$span(style="color:grey",("Please Use English Vocabulary Only.")),
-                                              br(),
-                                              tags$hr(),
-                                              h4("Next Word Predicted As:"),
-                                              tags$span(style="color:darkred",
-                                                        tags$strong(tags$h3(textOutput("predictedWord")))),
-                                              br(),
-                                              tags$hr(),
-                                              h4("Our Record Shows What You Have Entered:"),
-                                              tags$em(tags$h4(textOutput("enteredWords"))),
-                                              align="center")
-                              ),
-                              column(3)
-                            )
-                   ),
-                   ## Tab 2 - About 
-                   tabPanel("NOTES",
-                            fluidRow(
-                              column(2,
-                                     p("")),
-                              column(8,
-                                     includeMarkdown("./about.Rmd")),
-                              column(2,
-                                     p(""))
-                            )
-                   ),
-                   ## Footer
-                   tags$hr(),
-                   tags$br(),
-                   tags$span(style="color:grey", 
-                             tags$footer(("CREATED BY"), tags$a(
-                                           href="http://www.r-project.org/",
-                                           target="_blank",
-                                           "R"),
-                                         ("AND"), tags$a(
-                                           href="http://shiny.rstudio.com",
-                                           target="_blank",
-                                           "Shiny."),
-                                         align = "center"),
-                             tags$br()
-                   )
-)
-)
+shinyUI(fluidPage(
+  theme = "bootstrap.css",
+  titlePanel(h1("Next Word", align="center"),
+             windowTitle = "a coursera data science capstone project"),
+  h4("~ a coursera data science capstone project ~", align="center"),
+  hr(),
+  fluidRow(
+    column(12, offset=3,
+        tabsetPanel(type = "tabs",
+                    tabPanel("Prediction",
+                             "Write any ENGLISH into this text box:",
+                             textInput("phrase2", label = "", value = ""),
+                             tags$head(tags$style(type="text/css", "#phrase2 {width: 450px;}")),
+                             
+                             fluidRow(
+                               column(6,
+                                    "The next word (in your mind) is:",
+                                    h2(textOutput("nextword2")),
+                               column(12,
+                                    h5(textOutput("stats2"), align="right"))
+                               ))
+                    ),        
+                    tabPanel("About",
+                             fluidRow(
+                               column(6,
+                                      includeMarkdown("./about.Rmd"))
+                             )
+                    )
+                    
+        )
+    )
+  ),
+  hr(),
+  p("Created by ", a("R", href="http://www.r-project.org/",target="_blank"),
+    "and", a("Shiny", href="http://shiny.rstudio.com", target="_blank"), align="center")
+  
+))

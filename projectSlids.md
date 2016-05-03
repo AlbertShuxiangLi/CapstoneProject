@@ -26,11 +26,11 @@ APPLIED METHODS & MODELS (1)
 APPLIED METHODS & MODELS (2)
 ========================================================
 
-- When an user input text, the resulting data frames are used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
-- If the next word can not be found under current *N-Grams*, then *(N-1)-Grams* will be used.
+- When an user input text, up to last 5 words will be used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
 
-#### Note1: Currently, only frequency table has being used for speed reason.
-#### Note2: Stupid Backoff Algorithm and Kneser-Ney smoothing would be implemented if time allowed.
+- Stupid Backoff Algorithm has been implemented as following :
+
+Total_prob = 1*5Gram_prob + 0.4*4Gram_prob + 0.16*3Gram_prob + 0.064*2Gram_prob
 
 HOW TO USE
 ========================================================
@@ -39,7 +39,7 @@ HOW TO USE
 ***
 - Mobile users are targeted by this light-weighted application. 
 - While entering the text, the predicted next word will be shown instantaneously.
-- What the user has entered will be displayed for verification purpose.
+- And how many words and characters the user just has entered will be displayed too.
 
 NOTES
 ========================================================
