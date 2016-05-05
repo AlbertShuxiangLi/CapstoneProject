@@ -175,7 +175,7 @@ StupidBackoff <- function(x, alpha=0.4, getNrows=20, showNresults=1,
   if (nrow(df) == 0) {
     return("and")
   }
-  df <- df[df$nextword != "unk", ]  # remove unk
+  df <- df[df$nextword != "UNK", ]  # remove UNK
   if (showNresults > nrow(df)) {
     showNresults <- nrow(df)
   }

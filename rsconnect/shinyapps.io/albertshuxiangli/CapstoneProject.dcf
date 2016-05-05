@@ -1,8 +1,8 @@
 name: CapstoneProject
 account: albertshuxiangli
 server: shinyapps.io
-bundleId: 440237
+bundleId: 442105
 url: https://albertshuxiangli.shinyapps.io/CapstoneProject/
-when: 1462250702.9109
+when: 1462412302.67464
 asMultiple: FALSE
 asStatic: FALSE

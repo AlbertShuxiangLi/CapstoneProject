@@ -20,7 +20,7 @@ shinyUI(fluidPage(
                                     "The next word (in your mind) is:",
                                     h2(textOutput("nextword2")),
                                column(12,
-                                    h5(textOutput("stats2"), align="right"))
+                                    h5(textOutput("stats2"), align="left"))
                                ))
                     ),        
                     tabPanel("About",
@@ -34,7 +34,7 @@ shinyUI(fluidPage(
     )
   ),
   hr(),
-  p("Created by ", a("R", href="http://www.r-project.org/",target="_blank"),
+  p("Created by ", a("R", href="http://www.r-project.org/", target="_blank"),
     "and", a("Shiny", href="http://shiny.rstudio.com", target="_blank"), align="center")
   
 ))

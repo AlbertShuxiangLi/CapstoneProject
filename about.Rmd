@@ -19,29 +19,24 @@ output: html_document
 
 After a Corpus generated, then following clean up steps are performed.  
   
-  * Convert to ASCII to eliminate any funny words
   * Convert all words to lowercase
-  * Eliminate punctuation
-  * Eliminate numbers
-  * Strip whitespace
-  * Eliminate profan words
-  * English stop words
-  * Stemming (Using Porter's Stemming Algorithm)
-  * Create Plain Text Format
+  * Remove URL and special characters
+  * Eliminate numbers, punctuation, dashs and apostroples
+  * Strip whitespace, and Trim leading and trailing whitespace
 
-This sampled corpus was then used to creat unigram, bigram, trigram and quadgram [See wikipedia *N-Grams*](http://en.wikipedia.org/wiki/N-gram). 
+This sampled corpus was then used to creat Bigram, Trigram, Quadgram and Quintgram [See wikipedia *N-Grams*](http://en.wikipedia.org/wiki/N-gram). 
 
-When an user input text, up to last 5 words will be used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
+When an user input text, up to last 4 words will be used to predict the next word accroding to the frequencies of the underlying *N-Grams*. 
 
 Stupid Backoff Algorithm has been implemented as following formula:
 
-Total_prob = 1*5Gram_prob + 0.4*4Gram_prob + 0.16*3Gram_prob + 0.064*2Gram_prob 
+Total_prob = 1*Quintgrams_prob + 0.4*Quadgrams_prob + 0.16*Trigrams_prob + 0.064*Bigrams_prob 
 
 ******
 
 #### HOW TO USE
 
-Mobile users are targeted by this light-weighted application. While entering the text, the predicted next word will be shown instantaneously. And how many words and characters the user just has entered will be displayed too.
+Mobile users are targeted by this light-weighted application. While entering the text, the predicted next word will be shown instantaneously. And how many words and characters the user just has entered will be displayed too (see screen shot below).
 
 ![Application Screenshot](screen.png)
 
@@ -57,6 +52,4 @@ Mobile users are targeted by this light-weighted application. While entering the
 
 #### LINKS
 
-* The scripts related to this shiny application, as well as the milestone report and the presentation can be found in [this GitHub repository](https://github.com/AlbertShuxiangLi/CapstoneProject).
-
-* My Slid Deck is [HERE](http://rpubs.com/Albert_Shuxiang_Li/177961).
+* The scripts related to this shiny application, as well as the milestone report and the capstone project presentation (link) can be found in [this GitHub repository](https://github.com/AlbertShuxiangLi/CapstoneProject).

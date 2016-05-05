@@ -36,7 +36,7 @@ datalist <- c("C:/Example_NLP/final/en_US/en_US.blogs.txt",
               "C:/Example_NLP/final/en_US/en_US.news.txt",
               "C:/Example_NLP/final/en_US/en_US.twitter.txt")
 # Used 1% for code-testing, Used 2% for fast-but-not-so-accurate version
-mypercent <- 0.02
+mypercent <- 0.07
 myseed <- 3606
 setwd("C:/Example_NLP/final/en_US")
 blog.numlines <- as.numeric(gsub('[^0-9]', '', system("wc -l en_US.blogs.txt", intern=TRUE)))
@@ -184,7 +184,10 @@ cl <- makeCluster(numCores)
 results <- parLapply(cl, train.clean, processInput, rare=rare)
 stopCluster(cl)
 t4 <- Sys.time()
-t4 - t3 ## Time difference of 1.74422 days if mypercent=0.2
+t4 - t3 
+## Time difference of 1.74422 days if mypercent=0.2
+## Time difference of 6.389157 hours if mypercent=0.07
+## 4 Cores CPU 3.33 GHz with 8.0 GB Momory in Windows OS
 results <- unlist(results)
 writeLines(results, "C:/Example_NLP/train.unk.txt")
 cat("wrote unk-ed text to disk at C:/Example_NLP/train.unk.txt")
